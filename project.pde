@@ -1,34 +1,45 @@
+String[] Strings;
+
+
+
+
+
 void setup(){
     size(640, 360);
+    Strings = loadStrings("/Users/Михаил/Documents/processing_files/project/data/map.txt");
+    int[] mapLines = new int[Strings.length];
     
-    map();
+    
+    for(int j = 0; j < Strings.length; j++){
+        mapLines[j] = to_int(Strings[j]);
+    }
+
+    map(mapLines);
 }
 
-void map(){
-    String[] mapLines = loadStrings("/Users/Михаил/Documents/processing_files/project/data/map.txt");
+
+
+void map(int[] mapLines){
     int change_x = 0, change_y = -50;
-    int dir;
     
     translate(0, 360);
     draw_square(0, -50);
     
-    for(String i: mapLines){
-        dir = to_int(i);
-        
+    for(int dir: mapLines){
+
         if(dir == 1){
             change_y -= 50;
         }
         if(dir == 2){
             change_x += 50;
         }
-        
         if(dir == 3){
             change_y += 50;
         }
-        
         if(dir == 4){
             change_x -= 50;
         }
+
         draw_square(change_x, change_y);
     }
 }
@@ -49,3 +60,9 @@ int to_int(String str){
     }
     return 4;
 }
+
+//int checkPoint(int x, int y){
+    
+    
+    
+//}
