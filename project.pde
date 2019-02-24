@@ -3,7 +3,9 @@ int tmp, current_quest = 0, step = 0, wait = 0;
 int tile_height = 50, tile_width = 50;
 int answ_t = 0, answ_f = 0;
 PFont f;
-int curr_x = 0, curr_y = -51;
+int curr_x = 20, curr_y = -180;
+boolean first_map_draw = true;
+int start_x = 20, start_y = - 180;
 
 void setup() {
     size(640, 360);
@@ -15,7 +17,7 @@ void draw() {
     if (wait != 1) {
         switch(status) {
         case 1:
-            draw_map();
+            draw_map(false);
             break;
         case 2:
             delay(1000);
@@ -34,16 +36,19 @@ void mouseReleased() {
     switch(status){
         case 1 :
             if( width - 62 < mouse_x && mouse_y < 61 ){
+                
                 step = int(random(1, 5));
-                textSize(40);
-                fill(0);
-                text(step, width - 41, 42);
-                fill(255);
                 
                 status = 2;
                 wait = 0;
-                current_quest += step;
                 
+                int i;
+                for( i = 0; i < step; i++ ){
+                    
+                    current_quest += 1;
+                    draw_map(true);
+                    delay(5000);
+                }
             }
             break;
             
@@ -71,6 +76,15 @@ void mouseReleased() {
     }
 }
 
+void draw_step(){
+    
+    textSize(40);
+    fill(0);
+    text(step, width - 41, 42);
+    fill(255);
+    
+}
+
 int to_int(String str) {
     switch(str) {
     case "1":
@@ -89,7 +103,7 @@ int[] get_map() {
     String[] strings = loadStrings("/users/Михаил/Documents/processing_files/project/data/map.txt");
     int[] mapLines;
     mapLines = new int[strings.length];
-    for (int j = 0; j < strings.length; j++) {
+    for( int j = 0; j < strings.length; j++ ){
         tmp = to_int(strings[j]);
         if ( tmp > 0) {
             mapLines[j] = tmp;
@@ -98,38 +112,55 @@ int[] get_map() {
     return mapLines;
 }
 
-void draw_map() {
+void draw_map(boolean to_draw_step) {
     int[] mapLines = get_map();
 
     background(204);
-    int change_x = 0, change_y = -51;
+    int change_x = start_x, change_y = start_y;
     translate(0, 360);
     fill(255);
 
     // Drawing start
     draw_square(change_x, change_y);
-    int dir, i;
+    
     // Drawing map
+    int dir, i;
     for( i = 0; i < mapLines.length; i++ ){
-       
         dir = mapLines[i];
         switch(dir) {
-        case 1:
-            change_y -= tile_height;
-            break;
-        case 2:
-            change_x += tile_width;
-            break;
-        case 3:
-            change_y += tile_height;
-            break;
-        default:
-            change_x -= tile_width;
+            case 1:
+                change_y -= tile_height;
+                break;
+            case 2:
+                change_x += tile_width;
+                break;
+            case 3:
+                change_y += tile_height;
+                break;
+            default:
+                change_x -= tile_width;
         }
         draw_square(change_x, change_y);
+        if( ! first_map_draw ){
+            if(i == current_quest - 1){
+                fill(255, 0, 0);
+                circle(change_x + 25, change_y + 25, 20);
+                fill(255);
+            }
+        }
     }
+    
+    // Drawing start players position for the first time
+    if( first_map_draw ){
+        fill(255, 0, 0);
+        circle(start_x + 25, start_y + 25, 20);
+        fill(255);
+    }
+    
     translate(0, -360);
-
+    
+    fill(255);
+    
     // Drawing button
     rect(width - 60, -1, 60, 60);
     
@@ -141,18 +172,31 @@ void draw_map() {
     fill(255, 0, 0);
     text(answ_f, width - 160 + 45, 37);
     
+    // Printing step
+    if( to_draw_step ){
+        draw_step();
+    }
+    
     // Priniting "start"
     fill(0);
     textSize(20);
-    text("start", 3, height - 21);
+    text("start", start_x + 3, height - 21 + start_y + 50);
+    
+    
+    first_map_draw = false;
 }
 
 void draw_square(int x, int y) {
     rect(x, y, 50, 50);
+    //line(x, y, x, y + 50);
+    //line(x, y + 50, x + 50, y + 50);
+    //line(x + 50, y + 50, x + 50, y);
+    //line(x + 50, y, x, y);
 }
 
 void draw_quest() {
     background(204);
+    
     String s = loadStrings("/users/Михаил/Documents/processing_files/project/data/questions.txt")[current_quest - 1];
     fill(0);
     text(s, width/10, height/5, width * 4/5, height* 4/5);
