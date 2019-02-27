@@ -1,22 +1,23 @@
 int status = -1; // 1 - map, 2 - question, 3 - answer, -1 - start screen
 int tmp, step = 0, wait = 0;
-int tile_height = 78, tile_width = 78;
 PFont f;
-int curr_x = 50, curr_y = -100;
 boolean first_map_draw = true;
-int start_x = 50, start_y = - 100;
+int start_x = 50, start_y = -250;
 int n;
 boolean inputed_number = false;
-int square_side = 78;
+int square_side = 60;
 int player_w = square_side / 3, player_h = square_side / 2;
 int current_player = 0;
 int[] current_quest, answ_t, answ_f, mapLines;
 int [][] player_colors;
+int[][] COLORS = {{230, 25, 75}, {255, 225, 25}, {60, 180, 75}, {0, 130, 200}, {240, 50, 230}, {170, 110, 40}};
+PImage img;
 
 void setup() {
     size(1000, 700);
     f = createFont("Arial",16,true);
     String[] strings = loadStrings("/users/Михаил/Documents/processing_files/project/data/map.txt");
+    println(strings.length);
     mapLines = new int[strings.length];
     for( int j = 0; j < strings.length; j++ ){
         tmp = to_int(strings[j]);
@@ -41,15 +42,13 @@ void draw() {
                     current_quest[i] = 0;
                     answ_t[i] = 0;
                     answ_f[i] = 0;
-                    player_colors[i][0] = int(random(0, 255));
-                    player_colors[i][1] = int(random(0, 255));
-                    player_colors[i][2] = int(random(0, 255));
+                    player_colors[i] = COLORS[i];
                 }
             }
             draw_map(false);
             break;
         case 2:
-            delay(2000);
+            delay(500);
             draw_quest();
             break;
         case 3:
@@ -74,7 +73,7 @@ void mouseReleased() {
         case 1 :
             if( width - 62 < mouse_x && mouse_y < 61 ){
                 
-                step = int(random(1, 5));
+                step =  1;  // int(random(1, 5));
                 
                 status = 2;
                 wait = 0;
@@ -228,16 +227,16 @@ void draw_map(boolean to_draw_step) {
             dir = mapLines[i];
             switch(dir) {
                 case 1:
-                change_y -= tile_height;
+                change_y -= square_side;
                 break;
                 case 2:
-                change_x += tile_width;
+                change_x += square_side;
                 break;
                 case 3:
-                change_y += tile_height;
+                change_y += square_side;
                 break;
                 default:
-                change_x -= tile_width;
+                change_x -= square_side;
             }
         }
         stroke(0);
@@ -250,6 +249,10 @@ void draw_map(boolean to_draw_step) {
             }
         }
     }
+    
+    // Drawing finish
+    fill(255, 255, 0);
+    rect(change_x + square_side, change_y, square_side, square_side);
     
     first_map_draw = false;
     
@@ -304,17 +307,17 @@ void draw_quest() {
     textSize(50);
     text("Answer", width - 217, height - 60);
     
-    textSize(32);
-    String s = loadStrings("/users/Михаил/Documents/processing_files/project/data/questions.txt")[current_quest[current_player] - 1];
-    text(s, width/5, height/5, width * 4/5, height* 4/5);
+    imageMode(CORNERS);
+    img = loadImage("/users/Михаил/Documents/processing_files/project/quest/" + str(current_quest[current_player] - 1) + ".jpg");
+    image(img, width/5 - 50, height/5 - 50);
 }
 
 void draw_answer(){
     background(204);
     
-    String s = loadStrings("/users/Михаил/Documents/processing_files/project/data/answers.txt")[current_quest[current_player] - 1];
-    textSize(32);
-    text(s, width/5, height/5, width * 4/5, height* 4/5);
+    imageMode(CORNERS);
+    img = loadImage("/users/Михаил/Documents/processing_files/project/answ/" + str(current_quest[current_player] - 1) + ".jpg");
+    image(img, width/5 - 50, height/5 - 50);
     
     // Drawing two buttons
     fill(255, 0, 0);
